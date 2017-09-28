@@ -1,7 +1,6 @@
-#from django.shortcuts import render
-#from django.http import HttpResponse
 from django.views.generic import View
 from django.shortcuts import render
+from .models import Tweet, User
 
 # Create your views here.
 class Index(View):
@@ -9,12 +8,13 @@ class Index(View):
         params = {}
         params["name"] = "Roy"
         return render(request, "base.html", params)
-        #return HttpResponse('I am called from a get Request')
-    # def post(self, request):
-    #     return HttpResponse('I am called from a post Request')
 
-# def index(request):
-#     if request.method == 'GET':
-#         return HttpResponse('I am called from a get Request')
-#     elif request.method == 'POST':
-#         return HttpResponse('I am called from a post Request')
+class Profile(View):
+    """User Profile reachable from /user/<username> URL"""
+    def get(self, request, username):
+        params = dict()
+        user = User.objects.get(username=username)
+        tweets = Tweet.objects.filter(user=user)
+        params["tweets"] = tweets
+        params["user"] = user
+        return render(request, 'profile.html', params)
