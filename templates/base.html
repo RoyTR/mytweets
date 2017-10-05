@@ -2,6 +2,8 @@
 <html>
     <head>
         <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" media="screen" />
+        {% block css %}
+        {% endblock %}
     </head>
 
     <body>
@@ -21,5 +23,7 @@
 
         <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
         <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+        {% block js %}
+        {% endblock %}
     </body>
 </html>

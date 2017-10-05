@@ -1,8 +1,10 @@
 from django.http import HttpResponseRedirect, HttpResponse
+from django.template.loader import render_to_string
 from django.views.generic import View
 from django.shortcuts import render
 from .models import Tweet, User, HashTag
-from .forms import TweetForm
+from .forms import TweetForm, SearchForm
+import json
 
 # Create your views here.
 class Index(View):
@@ -19,7 +21,7 @@ class Profile(View):
         tweets = Tweet.objects.filter(user=user)
         params["tweets"] = tweets
         params["user"] = user
-        params["form"] = TweetForm
+        params["form"] = TweetForm()
         return render(request, 'profile.html', params)
 
 class PostTweet(View):
@@ -44,4 +46,23 @@ class HashTagCloud(View):
         hashtag = HashTag.objects.get(name=hashtag)
         params["tweets"] = hashtag.tweet
         return render(request, 'hashtag.html', params)
+
+class Search(View):
+    """Search all tweets with jquery /search/?query=<query> URL"""
+    def get(self, request):
+        form = SearchForm()
+        params = dict()
+        params["search"] = form
+        return render(request, 'search.html', params)
+
+    def post(self, request):
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            tweets = Tweet.objects.filter(text__icontains=query)
+            context = dict({"query": query, "tweets": tweets})
+            return_str = render_to_string('partials/_tweet_search.html', context)
+            return HttpResponse(json.dumps(return_str), content_type="application/json")
+        else:
+            HttpResponse("/search.html")
                     
